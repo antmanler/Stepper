@@ -248,9 +248,9 @@
 		}
 		// this below may get the right diff
 		var exp = Math.pow(10, data.digits);
-		var diff = parseInt((((value - data.min) * exp) % (data.step*exp)))/exp;
+		var diff = Math.round((value - data.min) * exp) % Math.round((data.step*exp));
 		if (diff !== 0) {
-			value -= diff;
+			value -= diff/exp;
 		}
 
 		if (data.min !== false && value < data.min) {
