@@ -1,5 +1,5 @@
 /* 
- * Stepper v3.0.7 - 2014-05-07 
+ * Stepper v3.0.7 - 2014-07-09 
  * A jQuery plugin for cross browser number inputs. Part of the Formstone Library. 
  * http://formstone.it/stepper/ 
  * 
@@ -246,8 +246,9 @@
 		} else {
 			value += originalValue;
 		}
-
-		var diff = (value - data.min) % data.step;
+		// this below may get the right diff
+		var exp = Math.pow(10, data.digits);
+		var diff = parseInt((((value - data.min) * exp) % (data.step*exp)))/exp;
 		if (diff !== 0) {
 			value -= diff;
 		}
