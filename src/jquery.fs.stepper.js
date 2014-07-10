@@ -147,7 +147,8 @@
 			}
 
 			// Bind keyboard events
-			$stepper.on("keypress", ".stepper-input", data, _onKeyup);
+			$stepper.on("keypress", ".stepper-input", data, _onKeypress);
+			$stepper.on("blur", ".stepper-input", data, _onBlur);
 
 			// Bind click events
 			$stepper.on("touchstart.stepper mousedown.stepper", ".stepper-arrow", data, _onMouseDown)
@@ -157,11 +158,11 @@
 
 	/**
 	 * @method private
-	 * @name _onKeyup
+	 * @name _onKeypress
 	 * @description Handles keypress event on inputs
 	 * @param e [object] "Event data"
 	 */
-	function _onKeyup(e) {
+	function _onKeypress(e) {
 		var data = e.data;
 
 		// If arrow keys
@@ -169,7 +170,31 @@
 			e.preventDefault();
 
 			_step(data, (e.keyCode === 38) ? data.step : -data.step);
+		} else if (event.keyCode === 46) {
+			var val = data.$input.val();
+			if (val.indexOf('.') !== -1) {
+				// ignore extra dot
+				e.preventDefault();
+			}
+		} else if (event.keyCode === 13) {
+			// handle enter, verify
+			_onBlur(e);
 		}
+
+	}
+
+	function _onBlur(e) {
+		var data = e.data;
+		var val = data.$input.val();
+		val = parseFloat(val);
+		var valDiff = val - data.min;
+		var exp = Math.pow(10, data.digits);
+		var diff = Math.round(valDiff*exp) % Math.round(data.step*exp);
+		if (diff !== 0) {
+			diff = diff/exp;
+		}
+		data.$input.val(_round(val, data.digits));
+		_step(data, diff);
 	}
 
 	/**
@@ -249,7 +274,8 @@
 			value = data.min;
 		}
 		if (data.max !== false && value > data.max) {
-			value -= data.step;
+//			value -= data.step;
+			value = data.max;
 		}
 
 		if (value !== originalValue) {
